@@ -1,184 +1,112 @@
 import React from "react";
-import "./App.css";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+	Redirect
+} from "react-router-dom";
 
-// inputs
-// controlled vs uncontrolled
-// ref
+// This site has 3 pages, all of which are rendered
+// dynamically in the browser (not server rendered).
+//
+// Although the page does not ever refresh, notice how
+// React Router keeps the URL up to date as you navigate
+// through the site. This preserves the browser history,
+// making sure things like the back button and bookmarks
+// work properly.
 
-function App() {
-	//controlled inputs
+export default function BasicExample() {
+  return (
+    <Router>
+      <div>
+        <ul>
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/about">About</Link>
+          </li>
+          <li>
+            <Link to="/dashboard">Dashboard</Link>
+          </li>
+        </ul>
 
-	// const firstName = React.useRef(); //через ref доступ до елементів
-	// const lastName = React.useRef();
-	// const email = React.useRef();
-	// const age = React.useRef();
-	// const pass = React.useRef();
+        <hr />
 
-	// const form = React.useRef();
+        {/*
+          A <Switch> looks through all its children <Route>
+          elements and renders the first one whose path
+          matches the current URL. Use a <Switch> any time
+          you have multiple routes, but you want only one
+          of them to render at a time
+        */}
+        <Switch>
+					{/* Стандартний спосіб */}
+					{/* exact щоб була точна перевірка */}
+					{/* <Route exact path="/"> */}
+            {/* <Home /> */}
+          {/* </Route> */}
 
-	// const onSubmit = (e) => {
-	// 	e.preventDefault(); //робиться по дефолту
+					{/* Другий спосіб */}
+					<Route exact path="/" component={Home} exact />
+					
+					{/* Третій спосіб для замутів */}
+					{/* <Route path="/users" render={(args) => {
+						console.log(args);
+						return <Users />
+					}}
+					/> */}
 
-		// console.log({ firstName });
-		// firstName.current.value = ""; //наприклад очистити поле при кліку на submit
-		// firstName.current.focus(); //фокус при кліку на submit (можна юзати всі методи з DOMу)
-		// firstName.current.style.background = "red"; //змінити стиль
+					{/* Четвертий спосіб */}
+          <Route path="/about">
+            {About}
+          </Route>
 
-		// з прив'язкою до input name="firstName"
-		// 		const {
-		// 			target: {
-		// 				elements: {
-		// 				firstName,
-		// 				lastName,
-		// 				email,
-		// 				age,
-		// 				pass,
-		// 		}
-		// 	}
-		// } = e;
+          <Route path="/dashboard">
+            <Dashboard />
+          </Route>
 
-		// console.log({ firstName, lastName, email, age, pass });
-		//якщо робимо через name то - firstName.value, якщо через ref то - firstName.current.value
-		// alert(
-		// 	JSON.stringify(
-		// 		{
-		// 			firstName: firstName.current.value,
-		// 			lastName: lastName.current.value,
-		// 			email: email.current.value,
-		// 			age: age.current.value,
-		// 			pass: pass.current.value,
-		// 		},
-		// 		null,
-		// 		2
-		// 	)
-		// ); //   для null, 2 для того, щоб в алерті все відображалось в стовпчик
+					{/* Якщо немає path означає прийми всі і виведеться h1 */}
+					{/* <Route>
+						<h1>PAGE NOT FOUND</h1>
+					</Route> */}
 
-		// для очистки форм
-		// firstName: firstName.current.value = '';
-		// lastName: lastName.current.value = '';
-		// email: email.current.value = '';
-		// age: age.current.value = '';
-		// pass: pass.current.value = '';
-		
-		//!чому бахає помилку
-		// form.current.reset();
-	
-		//controlled inputs - частіше за все використовується
-	const [firstName, setFirstName] = React.useState('');
-	const [lastName, setLastName] = React.useState('');
-	const [email, setEmail] = React.useState('');
-	const [age, setAge] = React.useState('');
-	const [pass, setPass] = React.useState('');
+					{/* При введенні урли яка не відповідає тим, що ми зазначили - кидає на / який відповідає home
+					До того треба імпортувати з Router - Redirect */}
+					<Route>
+            <Redirect to="/" />
+          </Route>
 
-	const handleSubmit = () => {
-		alert(JSON.stringify({
-			firstName,
-			lastName,
-			email,
-			age,
-			pass,
-		}, null, 2))
-
-	}
-
-	return (
-		// <div className="App">
-		// 	<h1>this is input!</h1>
-		// 	<form onSubmit={onSubmit}>
-		// 		<input
-		// 			ref={firstName}
-		// 			type="text"
-		// 			name="firstName" //без name буде працювати коли є ref, але його треба добавляти
-		// 			placeholder="enter your first name"
-		// 		/>
-		// 		<br />
-		// 		<br />
-		// 		<input
-		// 			ref={lastName}
-		// 			type="text"
-		// 			name="lastName"
-		// 			placeholder="enter your last name"
-		// 		/>
-		// 		<br />
-		// 		<br />
-		// 		<input
-		// 			ref={email}
-		// 			type="email"
-		// 			name="email"
-		// 			placeholder="enter your email"
-		// 		/>
-		// 		<br />
-		// 		<br />
-		// 		<input
-		// 			ref={age}
-		// 			type="number"
-		// 			name="age"
-		// 			placeholder="enter your age"
-		// 		/>
-		// 		<br />
-		// 		<br />
-		// 		<input
-		// 			ref={pass}
-		// 			type="password"
-		// 			name="pass"
-		// 			placeholder="enter your pass"
-		// 		/>
-
-		// 		<button type="submit">submit</button>
-		// 	</form>
-		// </div>
-
-
-				<div className="App">
-			<h1>this is input!</h1>
-				<input
-					value={firstName} 
-					onChange={({target: {value}}) => setFirstName(value)}
-					type="text"
-					name="firstName" 
-					placeholder="enter your first name"
-				/>
-				<br />
-				<br />
-				<input
-				value={lastName}
-				onChange={({target: {value}}) => setLastName(value)}
-					type="text"
-					name="lastName"
-					placeholder="enter your last name"
-				/>
-				<br />
-				<br />
-				<input
-				value={email}
-				onChange={({target: {value}}) => setEmail(value)}
-					type="email"
-					name="email"
-					placeholder="enter your email"
-				/>
-				<br />
-				<br />
-				<input
-				value={age}
-				onChange={({target: {value}}) => setAge(value)}
-					type="number"
-					name="age"
-					placeholder="enter your age"
-				/>
-				<br />
-				<br />
-				<input
-				value={pass}
-				onChange={({target: {value}}) => setPass(value)}
-					type="password"
-					name="pass"
-					placeholder="enter your pass"
-				/>
-
-				<button onClick={handleSubmit}>submit</button>
-		</div>
-
-	);
+        </Switch>
+      </div>
+    </Router>
+  );
 }
 
-export default App;
+// You can think of these components as "pages"
+// in your app.
+
+function Home() {
+  return (
+    <div>
+      <h2>Home</h2>
+    </div>
+  );
+}
+
+function About() {
+  return (
+    <div>
+      <h2>About</h2>
+    </div>
+  );
+}
+
+function Dashboard() {
+  return (
+    <div>
+      <h2>Dashboard</h2>
+    </div>
+  );
+}
