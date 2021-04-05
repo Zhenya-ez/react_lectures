@@ -4,79 +4,45 @@ import {
   Switch,
   Route,
   Link,
-	Redirect
+	Redirect,
+	useLocation,
+	useParams,
+	useRouteMatch,
+	useHistory
 } from "react-router-dom";
 
-// This site has 3 pages, all of which are rendered
-// dynamically in the browser (not server rendered).
-//
-// Although the page does not ever refresh, notice how
-// React Router keeps the URL up to date as you navigate
-// through the site. This preserves the browser history,
-// making sure things like the back button and bookmarks
-// work properly.
 
 export default function BasicExample() {
   return (
     <Router>
       <div>
+				<nav>
         <ul>
           <li>
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to="/about">About</Link>
+          <Link to="/posts">Posts</Link>
           </li>
-          <li>
-            <Link to="/dashboard">Dashboard</Link>
-          </li>
-        </ul>
+				</ul>
+			</nav>
 
-        <hr />
-
-        {/*
-          A <Switch> looks through all its children <Route>
-          elements and renders the first one whose path
-          matches the current URL. Use a <Switch> any time
-          you have multiple routes, but you want only one
-          of them to render at a time
-        */}
         <Switch>
-					{/* Стандартний спосіб */}
-					{/* exact щоб була точна перевірка */}
-					{/* <Route exact path="/"> */}
-            {/* <Home /> */}
-          {/* </Route> */}
-
-					{/* Другий спосіб */}
-					<Route exact path="/" component={Home} exact />
+					<Route path="/" component={Home} exact />
 					
-					{/* Третій спосіб для замутів */}
-					{/* <Route path="/users" render={(args) => {
-						console.log(args);
-						return <Users />
-					}}
-					/> */}
+					{/* Те саме, просто другий вид запису */}
+					<Route path="/posts" exact>
+						<Posts />
+					</Route> 
 
-					{/* Четвертий спосіб */}
-          <Route path="/about">
-            {About}
-          </Route>
+					{/* :id - динамічний параметр */}
+					<Route path="/posts/:id">
+						<PostsDetails />
+					</Route> 
 
-          <Route path="/dashboard">
-            <Dashboard />
-          </Route>
-
-					{/* Якщо немає path означає прийми всі і виведеться h1 */}
-					{/* <Route>
-						<h1>PAGE NOT FOUND</h1>
-					</Route> */}
-
-					{/* При введенні урли яка не відповідає тим, що ми зазначили - кидає на / який відповідає home
-					До того треба імпортувати з Router - Redirect */}
 					<Route>
-            <Redirect to="/" />
-          </Route>
+						<h1>PAGE NOT FOUND</h1>
+					</Route>
 
         </Switch>
       </div>
@@ -84,29 +50,57 @@ export default function BasicExample() {
   );
 }
 
-// You can think of these components as "pages"
-// in your app.
-
-function Home() {
-  return (
-    <div>
-      <h2>Home</h2>
-    </div>
-  );
+function Home(props) {
+	console.log(props);
+  return <h2>Home</h2>;
 }
 
-function About() {
-  return (
-    <div>
-      <h2>About</h2>
-    </div>
-  );
+function Posts(props) {
+	console.log(props);
+	const [posts, setPosts] = React.useState([]);
+
+	const fetchData = async () => {
+		const resp = await fetch('https://jsonplaceholder.typicode.com/posts');
+		const json = await resp.json();
+
+		setPosts(json)
+	}
+
+	React.useEffect(() => {
+		fetchData()
+	}, [])
+	return (<div>
+		<ul>
+			{posts.map(el => <Link to={`/posts/${el.id}`}><li>{el.title} - {el.id}</li></Link>)}
+		</ul>
+		</div>);
 }
 
-function Dashboard() {
-  return (
-    <div>
-      <h2>Dashboard</h2>
-    </div>
-  );
+function PostsDetails(props) {
+	console.log(props);
+	const [post, setPost] = React.useState();
+
+	const match = useRouteMatch();
+	const {id} = useParams();
+	const location = useLocation();
+	const history = useHistory();
+
+
+	const fetchData = async () => {
+		const resp = await fetch(`https://jsonplaceholder.typicode.com/posts/${id}`);
+		const json = await resp.json();
+
+		setPost(json)
+	}
+
+	React.useEffect(() => {
+		fetchData()
+	}, [id])
+
+	return (<div>
+		<h1>post details</h1>
+		{post && (<> <h3>{post.title}</h3> <p>{post.body}</p> </>)}
+
+		<button onClick={() => history.push(`/posts/${+id + 1}`)}>go to next post</button>
+		</div>);
 }
