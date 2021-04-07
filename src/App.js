@@ -1,52 +1,119 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext, useContext, useState } from "react";
+import { Switch, BrowserRouter as Router, Route, Link } from "react-router-dom";
 
-const CounterContext = createContext();
+const TodoContext = createContext();
 
-const ContextProvider = ({children}) => {
-	const [counter, setCounter] = React.useState(0)
+const TodoContextProvider = ({children}) => {
+	const [todos, setTodos] = React.useState([]);
 
-	const incCounter = () => {
-		setCounter(counter + 1)
-	}
+	const onTodoCreate = (newTodo) => {
+		if(!newTodo || !newTodo.title || !newTodo.description) {
+			console.error('wrong arg for new todo, should be smth like {title "...", description: "..."}')
+			return
+		}
 
-	const decCounter = () => {
-		setCounter(counter - 1)
+		setTodos([newTodo,...todos ])
 	}
 
 	return (
-		<CounterContext.Provider value={{
-			counter,
-			incCounter,
-			decCounter
-		}}>
-			{children}
-		</CounterContext.Provider>
+		<TodoContext.Provider value={{
+			todos,
+			onTodoCreate
+			}}>
+		{children}
+		</TodoContext.Provider>
 	)
 }
 
-const Counter = () => {
-	const { counter, incCounter, decCounter } = useContext(CounterContext);
+const TodoItem = ({todo}) => {
+
 	return (
-		<>
-		<h3>Counter : {counter}</h3>
-		<button onClick={incCounter}>inc</button>
-		<button onClick={decCounter}>dec</button>
-		</>
+		<div>
+			<h4>{todo.title}</h4> 
+			<p>{todo.description}</p> 
+		</div>
+	)
+}
+
+const TodosList = () => {
+	const {
+		todos
+	} = useContext(TodoContext)
+
+	return (
+		<div>
+			{todos.map(el => <TodoItem key={el.title + el.description} todo={el} />)}
+		</div>
+	)
+}
+
+const AddTodo = () => {
+	const [todoValues, setTodoValues] = React.useState({
+		title: '',
+		description: '',
+	})
+
+	const {
+		onTodoCreate
+	} = useContext(TodoContext)
+
+	const onTodoChange = ({target: {name, value}}) => setTodoValues({...todoValues, [name]: value})
+	
+const onCreate = () => {
+	onTodoCreate(todoValues)
+	setTodoValues({
+		title: '',
+		description: '',
+})
+}
+	
+	return (
+		<div>
+			<input value={todoValues.title} onChange={onTodoChange} type="text" name="title" placeholder="todo title"/>
+			<br />
+			<br />
+			<input value={todoValues.description} onChange={onTodoChange} type="text" name="description" placeholder="todo description"/>
+			<br />
+			<br />
+			<button onClick={onCreate}>add todo</button>
+		</div>
 	)
 }
 
 const Header = () => {
-	const { counter } = useContext(CounterContext);
+
 	return (
-		<h1>Header counter: {counter}</h1>
+		<header>
+			<Link to="/">List</Link>
+			<Link to="/create-todo">add new todo</Link>
+		</header>
 	)
 }
 
 export default function App() {
-  return (
-		<ContextProvider>
-		<Header />
-		<Counter />
-		</ContextProvider>
+	
+	return (
+		// 1 список тудушок, де ми можемо маркувати їх як виконані або видаляти
+		// 2 формочка для створення нової тудушки
+		<TodoContextProvider>
+		<main>
+		<Router>
+			<Header /> 
+
+			<div  style={{padding: 20}}>
+			<Switch>
+				<Route path="/" exact>
+				<TodosList />
+				</Route>
+
+				<Route path="/create-todo">
+					<AddTodo />
+				</Route>
+			</Switch>
+			</div>
+
+		</Router>
+		</main>
+		</TodoContextProvider>
 	);
 }
