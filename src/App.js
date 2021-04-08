@@ -4,7 +4,7 @@ import { Switch, BrowserRouter as Router, Route, Link } from "react-router-dom";
 const TodoContext = createContext();
 
 const TodoContextProvider = ({children}) => {
-	const [todos, setTodos] = React.useState([]);
+	const [todos, setTodos] = useState([]);
 
 	const onTodoCreate = (newTodo) => {
 		if(!newTodo || !newTodo.title || !newTodo.description) {
@@ -48,7 +48,7 @@ const TodosList = () => {
 }
 
 const AddTodo = () => {
-	const [todoValues, setTodoValues] = React.useState({
+	const [todoValues, setTodoValues] = useState({
 		title: '',
 		description: '',
 	})
@@ -100,7 +100,7 @@ export default function App() {
 		<Router>
 			<Header /> 
 
-			<div  style={{padding: 20}}>
+			<div style={{padding: 20}}>
 			<Switch>
 				<Route path="/" exact>
 				<TodosList />
